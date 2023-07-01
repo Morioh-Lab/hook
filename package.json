@@ -1,0 +1,27 @@
+{
+  "name": "@morioh/hook",
+  "version": "0.1.0",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "scripts": {
+    "format": "prettier --write \"./src/**/*.ts\"",
+    "build": "rm -rf dist && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs --target es5",
+    "build:esm": "tsc -m esNext --outDir dist/esm --target es6",
+    "prod": "webpack --mode production --progress && npm run build:es",
+    "pub": "npm publish --access public",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.36",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "typescript": "^4.9.5"
+  }
+}

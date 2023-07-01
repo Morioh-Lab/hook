@@ -1,0 +1,12 @@
+export declare const isBrowser: boolean;
+export declare const isNavigator: boolean;
+export declare const isObject: (value: unknown) => value is Record<any, any>;
+export declare const isFunction: (value: unknown) => value is (...args: any) => any;
+export declare const isString: (value: unknown) => value is string;
+export declare const isBoolean: (value: unknown) => value is boolean;
+export declare const isNumber: (value: unknown) => value is number;
+export declare const isUndef: (value: unknown) => value is undefined;
+export declare function parseJSON<T>(value: string | null): T | undefined;
+export declare function on<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['addEventListener']> | [string, Function | null, ...any]): void;
+export declare function off<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['removeEventListener']> | [string, Function | null, ...any]): void;
+export declare function throttle(cb: Function, ms: number): () => void;
