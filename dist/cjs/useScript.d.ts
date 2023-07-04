@@ -1,9 +1,5 @@
-interface IScriptProps {
-    src: string;
+interface IHTMLAttributes {
     [key: string]: any;
 }
-export declare function useScript({ src, ...attrs }: IScriptProps): {
-    loading: boolean;
-    error: Event | undefined;
-};
+export declare function useScript(src: string, attrs?: IHTMLAttributes): string;
 export {};

@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { isBrowser } from './helper';
 
-interface ICssProps {
-    src: string;
+interface IHTMLAttributes {
     [key: string]: any;
 }
 
-export function useCss({ src, ...attrs }: ICssProps) {
+export function useCss(src: string, attrs: IHTMLAttributes = {}) {
     useEffect(() => {
         let el: HTMLLinkElement | null = document.querySelector(`link[href="${src}"]`);
 

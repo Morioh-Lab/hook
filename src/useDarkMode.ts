@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { useMediaQuery } from './useMediaQuery';
 
@@ -15,11 +14,11 @@ export function useDarkMode(defaultValue?: boolean): UseDarkModeOutput {
     const isDarkOS = useMediaQuery(COLOR_SCHEME_QUERY);
     const [isDarkMode, setDarkMode] = useLocalStorage<boolean>('dark-mode', defaultValue ?? isDarkOS ?? false);
 
-    // Update darkMode if os prefers changes
-    useEffect(() => {
-        setDarkMode(isDarkOS);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isDarkOS]);
+    // // Update darkMode if os prefers changes
+    // useEffect(() => {
+    //     setDarkMode(isDarkOS);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [isDarkOS]);
 
     return {
         isDarkMode,

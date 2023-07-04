@@ -15,6 +15,7 @@ export * from './useLockBodyScroll';
 export * from './usePopupWindow';
 export * from './useMouse';
 export * from './useMediaQuery';
+export * from './useMounted';
 export * from './useNetwork';
 export * from './useThrottle';
 export * from './useIsomorphicLayoutEffect';
