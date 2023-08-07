@@ -36,7 +36,7 @@ __exportStar(require("./useNetwork"), exports);
 __exportStar(require("./useThrottle"), exports);
 __exportStar(require("./useIsomorphicLayoutEffect"), exports);
 __exportStar(require("./useMeasure"), exports);
-__exportStar(require("./useOnClickOutside"), exports);
+__exportStar(require("./useClickOutside"), exports);
 __exportStar(require("./useOrientation"), exports);
 __exportStar(require("./useLocalStorage"), exports);
 __exportStar(require("./useScript"), exports);

@@ -20,7 +20,7 @@ export * from './useNetwork';
 export * from './useThrottle';
 export * from './useIsomorphicLayoutEffect';
 export * from './useMeasure';
-export * from './useOnClickOutside';
+export * from './useClickOutside';
 export * from './useOrientation';
 export * from './useLocalStorage';
 export * from './useScript';

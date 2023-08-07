@@ -7,11 +7,14 @@ export function useDetectAdBlock(delay = 5000) {
     useEffect(() => {
         if (isDelayed) {
             // grab a domain from https://github1s.com/gorhill/uBlock/blob/master/docs/tests/hostname-pool.js
+            // https://pagead2.googlesyndication.com/pagead/show_ads.js
             fetch('https://www3.doubleclick.net', {
                 method: 'HEAD',
                 mode: 'no-cors',
                 cache: 'no-store',
-            }).catch(() => setAdBlockDetected(true));
+            })
+                .then(() => setAdBlockDetected(false))
+                .catch(() => setAdBlockDetected(true));
         }
     }, [isDelayed]);
     return adBlockDetected;

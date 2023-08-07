@@ -11,11 +11,14 @@ function useDetectAdBlock(delay) {
     (0, react_1.useEffect)(function () {
         if (isDelayed) {
             // grab a domain from https://github1s.com/gorhill/uBlock/blob/master/docs/tests/hostname-pool.js
+            // https://pagead2.googlesyndication.com/pagead/show_ads.js
             fetch('https://www3.doubleclick.net', {
                 method: 'HEAD',
                 mode: 'no-cors',
                 cache: 'no-store',
-            }).catch(function () { return setAdBlockDetected(true); });
+            })
+                .then(function () { return setAdBlockDetected(false); })
+                .catch(function () { return setAdBlockDetected(true); });
         }
     }, [isDelayed]);
     return adBlockDetected;
