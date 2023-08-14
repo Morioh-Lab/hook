@@ -10,7 +10,7 @@ export function useMouse() {
         elementPositionY: 0,
     });
     const ref = useRef(null);
-    const documentRef = useRef(document);
+    // const documentRef = useRef<Document>(document);
     useLayoutEffect(() => {
         const handleMouseMove = (event) => {
             let newState = {
@@ -33,11 +33,7 @@ export function useMouse() {
             }
             setState((s) => (Object.assign(Object.assign({}, s), newState)));
         };
-        // document.addEventListener('mousemove', handleMouseMove);
-        // return () => {
-        //     document.removeEventListener('mousemove', handleMouseMove);
-        // };
-        useEventListener('mousemove', handleMouseMove, documentRef);
+        useEventListener(document, 'mousemove', handleMouseMove);
     }, []);
     return [state, ref];
 }

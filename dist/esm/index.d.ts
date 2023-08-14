@@ -27,3 +27,4 @@ export * from './useScript';
 export * from './useSessionStorage';
 export * from './useTimeout';
 export * from './useVibration';
+export * from './useWindowFocused';

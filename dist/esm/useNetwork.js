@@ -29,13 +29,15 @@ function useNetwork() {
     const [state, setState] = useState(() => {
         return Object.assign({ since: undefined, online: navigator === null || navigator === void 0 ? void 0 : navigator.onLine }, getConnectionProperty());
     });
+    const onOnline = () => {
+        setState((prevState) => (Object.assign(Object.assign({}, prevState), { online: true, since: new Date() })));
+    };
+    const onOffline = () => {
+        setState((prevState) => (Object.assign(Object.assign({}, prevState), { online: false, since: new Date() })));
+    };
+    addEventListener('online', onOnline);
+    addEventListener('offline', onOffline);
     useEffect(() => {
-        const onOnline = () => {
-            setState((prevState) => (Object.assign(Object.assign({}, prevState), { online: true, since: new Date() })));
-        };
-        const onOffline = () => {
-            setState((prevState) => (Object.assign(Object.assign({}, prevState), { online: false, since: new Date() })));
-        };
         const onConnectionChange = () => {
             setState((prevState) => (Object.assign(Object.assign({}, prevState), getConnectionProperty())));
         };

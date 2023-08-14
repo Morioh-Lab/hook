@@ -46,23 +46,26 @@ function useNetwork(): NetworkState {
         };
     });
 
+    const onOnline = () => {
+        setState((prevState) => ({
+            ...prevState,
+            online: true,
+            since: new Date(),
+        }));
+    };
+
+    const onOffline = () => {
+        setState((prevState) => ({
+            ...prevState,
+            online: false,
+            since: new Date(),
+        }));
+    };
+
+    addEventListener('online', onOnline);
+    addEventListener('offline', onOffline);
+
     useEffect(() => {
-        const onOnline = () => {
-            setState((prevState) => ({
-                ...prevState,
-                online: true,
-                since: new Date(),
-            }));
-        };
-
-        const onOffline = () => {
-            setState((prevState) => ({
-                ...prevState,
-                online: false,
-                since: new Date(),
-            }));
-        };
-
         const onConnectionChange = () => {
             setState((prevState) => ({
                 ...prevState,

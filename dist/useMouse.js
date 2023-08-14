@@ -24,7 +24,7 @@ function useMouse() {
         elementPositionY: 0,
     }), state = _a[0], setState = _a[1];
     var ref = (0, react_1.useRef)(null);
-    var documentRef = (0, react_1.useRef)(document);
+    // const documentRef = useRef<Document>(document);
     (0, react_1.useLayoutEffect)(function () {
         var handleMouseMove = function (event) {
             var newState = {
@@ -47,11 +47,7 @@ function useMouse() {
             }
             setState(function (s) { return (__assign(__assign({}, s), newState)); });
         };
-        // document.addEventListener('mousemove', handleMouseMove);
-        // return () => {
-        //     document.removeEventListener('mousemove', handleMouseMove);
-        // };
-        (0, useEventListener_1.useEventListener)('mousemove', handleMouseMove, documentRef);
+        (0, useEventListener_1.useEventListener)(document, 'mousemove', handleMouseMove);
     }, []);
     return [state, ref];
 }

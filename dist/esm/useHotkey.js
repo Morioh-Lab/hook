@@ -1,4 +1,5 @@
 import { useEventListener } from './useEventListener';
+import { isBrowser } from './helper';
 const IS_MAC = typeof window !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 const MODIFIERS = {
     alt: 'altKey',
@@ -35,16 +36,13 @@ const createHotkey = (hotkeys, callback) => {
     let hasModifier = false;
     for (let i = 0; i < hotkeys.length; i++) {
         let key = String(hotkeys[i]).toLowerCase();
-        // @ts-ignore
         key = ALIASES[key] || key;
-        // @ts-ignore
         const modifier = MODIFIERS[key];
         hasModifier = hasModifier || !!modifier;
         keys.push({
             // Store the key for browsers that support event.key
             key,
             // Store the keyCode for browsers that don't support event.key
-            // @ts-ignore
             which: CODES[key] || key.toUpperCase().charCodeAt(0),
             // Is this key is a modifier? If so, include it's real name
             // as defined in the event here
@@ -59,9 +57,7 @@ const createHotkey = (hotkeys, callback) => {
         // Creates a list of modifiers defined in this event
         const eventModifiers = [];
         for (const modifier in MODIFIERS) {
-            // @ts-ignore
             const mod = MODIFIERS[modifier];
-            // @ts-ignore
             if (event[mod]) {
                 // If the event had a modifier and there wasn't one specified, just bail
                 if (!hasModifier)
@@ -107,13 +103,17 @@ const createHotkey = (hotkeys, callback) => {
         callback(event);
     };
 };
-export function useHotkeys(hotkeys, target) {
-    useEventListener('keydown', (event) => {
+export function useHotkey(...args) {
+    let target = isBrowser ? window : undefined;
+    let hotkey;
+    let callback;
+    args.length >= 3 ? ([target, hotkey, callback] = args) : ([hotkey, callback] = args);
+    return useHotkeys(target, [[hotkey, callback]]);
+}
+export function useHotkeys(target, hotkeys) {
+    useEventListener(target, 'keydown', (event) => {
         for (const [hotkey, callback] of hotkeys) {
             createHotkey(hotkey, callback)(event);
         }
-    }, target);
-}
-export function useHotkey(hotkey, callback, target) {
-    return useHotkeys([[hotkey, callback]], target);
+    });
 }

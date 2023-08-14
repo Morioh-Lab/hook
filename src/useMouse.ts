@@ -12,7 +12,7 @@ export function useMouse<T extends HTMLElement>() {
     });
 
     const ref = useRef<T>(null);
-    const documentRef = useRef<Document>(document);
+    // const documentRef = useRef<Document>(document);
 
     useLayoutEffect(() => {
         const handleMouseMove = (event: MouseEvent) => {
@@ -41,13 +41,7 @@ export function useMouse<T extends HTMLElement>() {
             setState((s) => ({ ...s, ...newState }));
         };
 
-        // document.addEventListener('mousemove', handleMouseMove);
-
-        // return () => {
-        //     document.removeEventListener('mousemove', handleMouseMove);
-        // };
-
-        useEventListener('mousemove', handleMouseMove, documentRef);
+        useEventListener(document, 'mousemove', handleMouseMove);
     }, []);
 
     return [state, ref];

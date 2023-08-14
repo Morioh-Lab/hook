@@ -43,3 +43,4 @@ __exportStar(require("./useScript"), exports);
 __exportStar(require("./useSessionStorage"), exports);
 __exportStar(require("./useTimeout"), exports);
 __exportStar(require("./useVibration"), exports);
+__exportStar(require("./useWindowFocused"), exports);

@@ -11,8 +11,9 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useHotkey = exports.useHotkeys = void 0;
+exports.useHotkeys = exports.useHotkey = void 0;
 var useEventListener_1 = require("./useEventListener");
+var helper_1 = require("./helper");
 var IS_MAC = typeof window !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 var MODIFIERS = {
     alt: 'altKey',
@@ -49,16 +50,13 @@ var createHotkey = function (hotkeys, callback) {
     var hasModifier = false;
     for (var i = 0; i < hotkeys.length; i++) {
         var key = String(hotkeys[i]).toLowerCase();
-        // @ts-ignore
         key = ALIASES[key] || key;
-        // @ts-ignore
         var modifier = MODIFIERS[key];
         hasModifier = hasModifier || !!modifier;
         keys.push({
             // Store the key for browsers that support event.key
             key: key,
             // Store the keyCode for browsers that don't support event.key
-            // @ts-ignore
             which: CODES[key] || key.toUpperCase().charCodeAt(0),
             // Is this key is a modifier? If so, include it's real name
             // as defined in the event here
@@ -73,9 +71,7 @@ var createHotkey = function (hotkeys, callback) {
         // Creates a list of modifiers defined in this event
         var eventModifiers = [];
         for (var modifier in MODIFIERS) {
-            // @ts-ignore
             var mod = MODIFIERS[modifier];
-            // @ts-ignore
             if (event[mod]) {
                 // If the event had a modifier and there wasn't one specified, just bail
                 if (!hasModifier)
@@ -121,16 +117,24 @@ var createHotkey = function (hotkeys, callback) {
         callback(event);
     };
 };
-function useHotkeys(hotkeys, target) {
-    (0, useEventListener_1.useEventListener)('keydown', function (event) {
+function useHotkey() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var target = helper_1.isBrowser ? window : undefined;
+    var hotkey;
+    var callback;
+    args.length >= 3 ? (target = args[0], hotkey = args[1], callback = args[2], args) : (hotkey = args[0], callback = args[1], args);
+    return useHotkeys(target, [[hotkey, callback]]);
+}
+exports.useHotkey = useHotkey;
+function useHotkeys(target, hotkeys) {
+    (0, useEventListener_1.useEventListener)(target, 'keydown', function (event) {
         for (var _i = 0, hotkeys_1 = hotkeys; _i < hotkeys_1.length; _i++) {
             var _a = hotkeys_1[_i], hotkey = _a[0], callback = _a[1];
             createHotkey(hotkey, callback)(event);
         }
-    }, target);
+    });
 }
 exports.useHotkeys = useHotkeys;
-function useHotkey(hotkey, callback, target) {
-    return useHotkeys([[hotkey, callback]], target);
-}
-exports.useHotkey = useHotkey;

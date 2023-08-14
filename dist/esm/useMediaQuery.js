@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { isBrowser } from './helper';
 // export function useMediaQuery(query: string): boolean {
 //     const subscribe = useCallback(
 //         (callback: any) => {
@@ -20,31 +19,26 @@ import { isBrowser } from './helper';
 //     return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 // }
 export function useMediaQuery(query) {
-    const getMatches = (query) => {
-        // Prevents SSR issues
-        return isBrowser ? window.matchMedia(query).matches : false;
-    };
-    const [matches, setMatches] = useState(getMatches(query));
-    function handleChange() {
-        setMatches(getMatches(query));
-    }
+    const [matches, setMatches] = useState(false);
     useEffect(() => {
         const matchMedia = window.matchMedia(query);
+        const handler = (event) => {
+            setMatches(event.matches);
+        };
         // Triggered at the first client-side load and if query changes
-        handleChange();
-        // Listen matchMedia
+        setMatches(matchMedia.matches);
         if (matchMedia.addListener) {
-            matchMedia.addListener(handleChange);
+            matchMedia.addListener(handler);
         }
         else {
-            matchMedia.addEventListener('change', handleChange);
+            matchMedia.addEventListener('change', handler);
         }
         return () => {
             if (matchMedia.removeListener) {
-                matchMedia.removeListener(handleChange);
+                matchMedia.removeListener(handler);
             }
             else {
-                matchMedia.removeEventListener('change', handleChange);
+                matchMedia.removeEventListener('change', handler);
             }
         };
     }, [query]);

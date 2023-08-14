@@ -1,4 +1,4 @@
-export const isBrowser = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+export const isBrowser = typeof window !== 'undefined'; // !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 export const isNavigator = typeof navigator !== 'undefined';
 
 export const isObject = (value: unknown): value is Record<any, any> => value !== null && typeof value === 'object';
@@ -8,6 +8,7 @@ export const isString = (value: unknown): value is string => typeof value === 's
 export const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean';
 export const isNumber = (value: unknown): value is number => typeof value === 'number';
 export const isUndef = (value: unknown): value is undefined => typeof value === 'undefined';
+
 
 // A wrapper for "JSON.parse()"" to support "undefined" value
 export function parseJSON<T>(value: string | null): T | undefined {
@@ -19,17 +20,17 @@ export function parseJSON<T>(value: string | null): T | undefined {
     }
 }
 
-export function on<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['addEventListener']> | [string, Function | null, ...any]): void {
-    if (obj && obj.addEventListener) {
-        obj.addEventListener(...(args as Parameters<HTMLElement['addEventListener']>));
-    }
-}
+// export function on<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['addEventListener']> | [string, Function | null, ...any]): void {
+//     if (obj && obj.addEventListener) {
+//         obj.addEventListener(...(args as Parameters<HTMLElement['addEventListener']>));
+//     }
+// }
 
-export function off<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['removeEventListener']> | [string, Function | null, ...any]): void {
-    if (obj && obj.removeEventListener) {
-        obj.removeEventListener(...(args as Parameters<HTMLElement['removeEventListener']>));
-    }
-}
+// export function off<T extends Window | Document | HTMLElement | EventTarget>(obj: T | null, ...args: Parameters<T['removeEventListener']> | [string, Function | null, ...any]): void {
+//     if (obj && obj.removeEventListener) {
+//         obj.removeEventListener(...(args as Parameters<HTMLElement['removeEventListener']>));
+//     }
+// }
 
 export function throttle(cb: Function, ms: number) {
     let lastTime = 0;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 interface IClipboard {
-    timeout: number;
+    timeout?: number;
 }
 
 export function useCopyToClipboard({ timeout = 3000 }: IClipboard): [boolean, (text: string) => void] {

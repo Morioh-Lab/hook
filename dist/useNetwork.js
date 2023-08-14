@@ -42,13 +42,15 @@ function useNetwork() {
     var _a = (0, react_1.useState)(function () {
         return __assign({ since: undefined, online: navigator === null || navigator === void 0 ? void 0 : navigator.onLine }, getConnectionProperty());
     }), state = _a[0], setState = _a[1];
+    var onOnline = function () {
+        setState(function (prevState) { return (__assign(__assign({}, prevState), { online: true, since: new Date() })); });
+    };
+    var onOffline = function () {
+        setState(function (prevState) { return (__assign(__assign({}, prevState), { online: false, since: new Date() })); });
+    };
+    addEventListener('online', onOnline);
+    addEventListener('offline', onOffline);
     (0, react_1.useEffect)(function () {
-        var onOnline = function () {
-            setState(function (prevState) { return (__assign(__assign({}, prevState), { online: true, since: new Date() })); });
-        };
-        var onOffline = function () {
-            setState(function (prevState) { return (__assign(__assign({}, prevState), { online: false, since: new Date() })); });
-        };
         var onConnectionChange = function () {
             setState(function (prevState) { return (__assign(__assign({}, prevState), getConnectionProperty())); });
         };

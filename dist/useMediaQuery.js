@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useMediaQuery = void 0;
 var react_1 = require("react");
-var helper_1 = require("./helper");
 // export function useMediaQuery(query: string): boolean {
 //     const subscribe = useCallback(
 //         (callback: any) => {
@@ -23,31 +22,26 @@ var helper_1 = require("./helper");
 //     return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 // }
 function useMediaQuery(query) {
-    var getMatches = function (query) {
-        // Prevents SSR issues
-        return helper_1.isBrowser ? window.matchMedia(query).matches : false;
-    };
-    var _a = (0, react_1.useState)(getMatches(query)), matches = _a[0], setMatches = _a[1];
-    function handleChange() {
-        setMatches(getMatches(query));
-    }
+    var _a = (0, react_1.useState)(false), matches = _a[0], setMatches = _a[1];
     (0, react_1.useEffect)(function () {
         var matchMedia = window.matchMedia(query);
+        var handler = function (event) {
+            setMatches(event.matches);
+        };
         // Triggered at the first client-side load and if query changes
-        handleChange();
-        // Listen matchMedia
+        setMatches(matchMedia.matches);
         if (matchMedia.addListener) {
-            matchMedia.addListener(handleChange);
+            matchMedia.addListener(handler);
         }
         else {
-            matchMedia.addEventListener('change', handleChange);
+            matchMedia.addEventListener('change', handler);
         }
         return function () {
             if (matchMedia.removeListener) {
-                matchMedia.removeListener(handleChange);
+                matchMedia.removeListener(handler);
             }
             else {
-                matchMedia.removeEventListener('change', handleChange);
+                matchMedia.removeEventListener('change', handler);
             }
         };
     }, [query]);

@@ -1,35 +1,28 @@
 import { useEffect, useRef } from 'react';
+import { isBrowser, isString } from './helper';
 import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect';
-function useEventListener(eventName, handler, element, options) {
-    // Create a ref that stores handler
-    const savedHandler = useRef(handler);
+export function useEventListener(...args) {
+    let target = isBrowser ? window : undefined;
+    let event;
+    let listener;
+    let options;
+    isString(args[0]) || Array.isArray(args[0]) ? ([event, listener, options] = args) : ([target, event, listener, options] = args);
+    const savedListener = useRef(listener);
     useIsomorphicLayoutEffect(() => {
-        savedHandler.current = handler;
-    }, [handler]);
+        savedListener.current = listener;
+    }, [listener]);
     useEffect(() => {
-        var _a;
-        // Define the listening target
-        const targetElement = (_a = element === null || element === void 0 ? void 0 : element.current) !== null && _a !== void 0 ? _a : window;
-        if (!(targetElement && targetElement.addEventListener))
+        const el = target && 'current' in target ? target.current : target;
+        if (!isBrowser || !el)
             return;
-        // Create event listener that calls handler function stored in ref
-        const listener = (event) => savedHandler.current(event);
-        targetElement.addEventListener(eventName, listener, options);
-        // Remove event listener on cleanup
+        const events = Array.isArray(event) ? event : [event];
+        events.forEach((e) => {
+            el.addEventListener(e, savedListener.current, options);
+        });
         return () => {
-            targetElement.removeEventListener(eventName, listener, options);
+            events.forEach((e) => {
+                el.removeEventListener(e, savedListener.current, options);
+            });
         };
-    }, [eventName, element, options]);
+    }, [event, target, options]);
 }
-// function useEventListeners<KW extends keyof WindowEventMap, KH extends keyof HTMLElementEventMap, KM extends keyof MediaQueryListEventMap, T extends HTMLElement | MediaQueryList | void = void>(
-//     eventName: KW[] | KH[] | KM[],
-//     handler: (event: WindowEventMap[KW] | HTMLElementEventMap[KH] | MediaQueryListEventMap[KM] | Event) => void,
-//     element?: RefObject<T>,
-//     options?: boolean | AddEventListenerOptions
-// ) {
-//     for (let i = 0; i < eventName.length; i++) {
-//         const e = eventName[i];
-//         useEventListener(e, handler, element, options);
-//     }
-// }
-export { useEventListener };

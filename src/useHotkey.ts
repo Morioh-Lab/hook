@@ -1,6 +1,7 @@
 //source: https://github.com/jaredLunde/react-hook/blob/master/packages/hotkey/src/index.tsx
 import { RefObject } from 'react';
 import { useEventListener } from './useEventListener';
+import { isBrowser } from './helper';
 
 const IS_MAC: boolean = typeof window !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 
@@ -223,18 +224,18 @@ const createHotkey = (hotkeys: Hotkey | Hotkey[], callback: HotkeyCallback): Hot
 
     for (let i = 0; i < hotkeys.length; i++) {
         let key = String(hotkeys[i]).toLowerCase();
-        // @ts-ignore
-        key = ALIASES[key] || key;
-        // @ts-ignore
-        const modifier = MODIFIERS[key];
+
+        key = ALIASES[key as keyof Aliases] || key;
+
+        const modifier = MODIFIERS[key as keyof Modifiers];
         hasModifier = hasModifier || !!modifier;
 
         keys.push({
             // Store the key for browsers that support event.key
             key,
             // Store the keyCode for browsers that don't support event.key
-            // @ts-ignore
-            which: CODES[key] || key.toUpperCase().charCodeAt(0),
+
+            which: CODES[key as keyof SpecialCodes] || key.toUpperCase().charCodeAt(0),
             // Is this key is a modifier? If so, include it's real name
             // as defined in the event here
             modifier: modifier,
@@ -249,9 +250,8 @@ const createHotkey = (hotkeys: Hotkey | Hotkey[], callback: HotkeyCallback): Hot
         const eventModifiers: string[] = [];
 
         for (const modifier in MODIFIERS) {
-            // @ts-ignore
-            const mod = MODIFIERS[modifier];
-            // @ts-ignore
+            const mod = MODIFIERS[modifier as keyof Modifiers];
+
             if (event[mod]) {
                 // If the event had a modifier and there wasn't one specified, just bail
                 if (!hasModifier) return;
@@ -296,25 +296,30 @@ const createHotkey = (hotkeys: Hotkey | Hotkey[], callback: HotkeyCallback): Hot
     };
 };
 
-export function useHotkeys<T extends Window = Window>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: Window | null): void;
-export function useHotkeys<T extends Document = Document>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: Document | null): void;
-export function useHotkeys<T extends HTMLElement = HTMLElement>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: RefObject<T> | T | null): void;
+export function useHotkey(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export function useHotkey<T extends Window = Window>(target: T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export function useHotkey<T extends Document = Document>(target: T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export function useHotkey<T extends HTMLElement = HTMLElement>(target: RefObject<T> | T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
 
-export function useHotkeys(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: any): void {
-    useEventListener(
-        'keydown',
-        (event) => {
-            for (const [hotkey, callback] of hotkeys) {
-                createHotkey(hotkey, callback)(event);
-            }
-        },
-        target
-    );
+export function useHotkey(...args: any[]) {
+    let target: any = isBrowser ? window : undefined;
+    let hotkey: Hotkey | Hotkey[];
+    let callback: HotkeyCallback;
+    args.length >= 3 ? ([target, hotkey, callback] = args) : ([hotkey, callback] = args);
+    return useHotkeys(target, [[hotkey, callback]]);
 }
+// export function useHotkey(target: any, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void {
+//     return useHotkeys(target, [[hotkey, callback]]);
+// }
 
-export function useHotkey<T extends Window = Window>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: Window | null): void;
-export function useHotkey<T extends Document = Document>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: Document | null): void;
-export function useHotkey<T extends HTMLElement = HTMLElement>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: RefObject<T> | T | null): void;
-export function useHotkey(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: any): void {
-    return useHotkeys([[hotkey, callback]], target);
+export function useHotkeys<T extends Window = Window>(target: T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;
+export function useHotkeys<T extends Document = Document>(target: T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;
+export function useHotkeys<T extends HTMLElement = HTMLElement>(target: RefObject<T> | T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;
+
+export function useHotkeys(target: any, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void {
+    useEventListener(target, 'keydown', (event) => {
+        for (const [hotkey, callback] of hotkeys) {
+            createHotkey(hotkey, callback)(event);
+        }
+    });
 }

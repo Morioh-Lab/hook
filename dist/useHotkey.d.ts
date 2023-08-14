@@ -81,9 +81,10 @@ export interface SpecialCodes {
 }
 export type Hotkey = keyof SpecialCodes | keyof Modifiers | keyof Aliases | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';
 export type HotkeyCallback = (event: KeyboardEvent) => void;
-export declare function useHotkeys<T extends Window = Window>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: Window | null): void;
-export declare function useHotkeys<T extends Document = Document>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: Document | null): void;
-export declare function useHotkeys<T extends HTMLElement = HTMLElement>(hotkeys: [Hotkey | Hotkey[], HotkeyCallback][], target: RefObject<T> | T | null): void;
-export declare function useHotkey<T extends Window = Window>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: Window | null): void;
-export declare function useHotkey<T extends Document = Document>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: Document | null): void;
-export declare function useHotkey<T extends HTMLElement = HTMLElement>(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback, target: RefObject<T> | T | null): void;
+export declare function useHotkey(hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export declare function useHotkey<T extends Window = Window>(target: T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export declare function useHotkey<T extends Document = Document>(target: T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export declare function useHotkey<T extends HTMLElement = HTMLElement>(target: RefObject<T> | T | null, hotkey: Hotkey | Hotkey[], callback: HotkeyCallback): void;
+export declare function useHotkeys<T extends Window = Window>(target: T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;
+export declare function useHotkeys<T extends Document = Document>(target: T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;
+export declare function useHotkeys<T extends HTMLElement = HTMLElement>(target: RefObject<T> | T | null, hotkeys: [Hotkey | Hotkey[], HotkeyCallback][]): void;

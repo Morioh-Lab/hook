@@ -1,64 +1,121 @@
 import { RefObject, useEffect, useRef } from 'react';
+import { isBrowser, isString } from './helper';
 import useIsomorphicLayoutEffect from './useIsomorphicLayoutEffect';
 
-// MediaQueryList Event based useEventListener interface
-function useEventListener<K extends keyof MediaQueryListEventMap>(eventName: K, handler: (event: MediaQueryListEventMap[K]) => void, element: RefObject<MediaQueryList>, options?: boolean | AddEventListenerOptions): void;
+// export type GeneralEventListener<E = Event> = (evt: E) => void;
 
-// Window Event based useEventListener interface
-function useEventListener<K extends keyof WindowEventMap>(eventName: K, handler: (event: WindowEventMap[K]) => void, element?: undefined, options?: boolean | AddEventListenerOptions): void;
+// export type ElementEventListener<K extends keyof HTMLElementEventMap = keyof HTMLElementEventMap> = (this: HTMLElement, ev: HTMLElementEventMap[K]) => any;
 
-// Element Event based useEventListener interface
-function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLDivElement>(
-    eventName: K,
-    handler: (event: HTMLElementEventMap[K]) => void,
-    element: RefObject<T>,
+/**
+ * Register listener using addEventListener when mounting, and removeEventListener automatically when un-mounting.
+ *
+ * Returns a cleanup function manually if you want to remove the listener manually.
+ *
+ * Overload 1: Omitted Window target
+ *
+ * @see https://morioh.com/react-hook/useEventListener
+ * @param event
+ * @param listener
+ * @param options
+ * @returns Clean up function for manual cleanup
+ */
+// export function useEventListener<E extends keyof WindowEventMap>(event: E, listener: GeneralEventListener<E>, options?: boolean | AddEventListenerOptions): void;
+export function useEventListener<K extends keyof WindowEventMap>(event: K | Array<K>, listener: (event: WindowEventMap[K]) => void, options?: boolean | AddEventListenerOptions): void;
+
+/**
+ * Register listener using addEventListener when mounting, and removeEventListener automatically when un-mounting.
+ *
+ * Returns a cleanup function manually if you want to remove the listener manually.
+ *
+ * Overload 2: Explicitly Window target
+ *
+ * @see https://morioh.com/react-hook/useEventListener
+ * @param target
+ * @param event
+ * @param listener
+ * @param options
+ * @returns Clean up function for manual cleanup
+ */
+//export function useEventListener<E extends keyof WindowEventMap>(target: Window, event: E, listener: GeneralEventListener<E>, options?: boolean | AddEventListenerOptions): void;
+
+export function useEventListener<K extends keyof WindowEventMap>(
+    target: RefObject<Window> | Window | null,
+    event: K | Array<K>,
+    listener: (event: WindowEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+): void;
+/**
+ * Register listener using addEventListener when mounting, and removeEventListener automatically when un-mounting.
+ *
+ * Returns a cleanup function manually if you want to remove the listener manually.
+ *
+ * Overload 3: Explicitly Document target
+ *
+ * @see https://morioh.com/react-hook/useEventListener
+ * @param target
+ * @param event
+ * @param listener
+ * @param options
+ * @returns Clean up function for manual cleanup
+ */
+//export function useEventListener<E extends keyof DocumentEventMap>(target: RefObject<Document> | Document | null, event: E, istener: GeneralEventListener<E>, options?: boolean | AddEventListenerOptions): void;
+export function useEventListener<K extends keyof DocumentEventMap>(
+    target: RefObject<Document> | Document | null,
+    event: K | Array<K>,
+    listener: (event: DocumentEventMap[K]) => void,
     options?: boolean | AddEventListenerOptions
 ): void;
 
-// Document Event based useEventListener interface
-function useEventListener<K extends keyof DocumentEventMap>(eventName: K, handler: (event: DocumentEventMap[K]) => void, element: RefObject<Document>, options?: boolean | AddEventListenerOptions): void;
-
-function useEventListener<KW extends keyof WindowEventMap, KH extends keyof HTMLElementEventMap, KM extends keyof MediaQueryListEventMap, T extends HTMLElement | MediaQueryList | void = void>(
-    eventName: KW | KH | KM,
-    handler: (event: WindowEventMap[KW] | HTMLElementEventMap[KH] | MediaQueryListEventMap[KM] | Event) => void,
-    element?: RefObject<T>,
+/**
+ * Register listener using addEventListener when mounting, and removeEventListener automatically when un-mounting.
+ *
+ * Returns a cleanup function manually if you want to remove the listener manually.
+ *
+ * Overload 4: Custom event target fallback
+ *
+ * @see https://morioh.com/react-hook/useEventListener
+ * @param target
+ * @param event
+ * @param listener
+ * @param options
+ * @returns Clean up function for manual cleanup
+ */
+export function useEventListener<K extends keyof HTMLElementEventMap = keyof HTMLElementEventMap>(
+    target: RefObject<HTMLElement> | HTMLElement | null | undefined,
+    event: K | Array<K>,
+    listener: (event: HTMLElementEventMap[K]) => void,
     options?: boolean | AddEventListenerOptions
-) {
-    // Create a ref that stores handler
-    const savedHandler = useRef(handler);
+): void;
+
+export function useEventListener(...args: any[]) {
+    let target: any = isBrowser ? window : undefined;
+    let event: string | string[];
+    let listener: EventListener;
+    let options: boolean | AddEventListenerOptions;
+
+    isString(args[0]) || Array.isArray(args[0]) ? ([event, listener, options] = args) : ([target, event, listener, options] = args);
+
+    const savedListener = useRef<EventListener>(listener);
 
     useIsomorphicLayoutEffect(() => {
-        savedHandler.current = handler;
-    }, [handler]);
+        savedListener.current = listener;
+    }, [listener]);
 
     useEffect(() => {
-        // Define the listening target
-        const targetElement: T | Window = element?.current ?? window;
+        const el = target && 'current' in target ? target.current : target;
 
-        if (!(targetElement && targetElement.addEventListener)) return;
+        if (!isBrowser || !el) return;
 
-        // Create event listener that calls handler function stored in ref
-        const listener: typeof handler = (event) => savedHandler.current(event);
+        const events = Array.isArray(event) ? event : [event];
 
-        targetElement.addEventListener(eventName, listener, options);
+        events.forEach((e) => {
+            el.addEventListener(e, savedListener.current, options);
+        });
 
-        // Remove event listener on cleanup
         return () => {
-            targetElement.removeEventListener(eventName, listener, options);
+            events.forEach((e) => {
+                el.removeEventListener(e, savedListener.current, options);
+            });
         };
-    }, [eventName, element, options]);
+    }, [event, target, options]);
 }
-
-// function useEventListeners<KW extends keyof WindowEventMap, KH extends keyof HTMLElementEventMap, KM extends keyof MediaQueryListEventMap, T extends HTMLElement | MediaQueryList | void = void>(
-//     eventName: KW[] | KH[] | KM[],
-//     handler: (event: WindowEventMap[KW] | HTMLElementEventMap[KH] | MediaQueryListEventMap[KM] | Event) => void,
-//     element?: RefObject<T>,
-//     options?: boolean | AddEventListenerOptions
-// ) {
-//     for (let i = 0; i < eventName.length; i++) {
-//         const e = eventName[i];
-//         useEventListener(e, handler, element, options);
-//     }
-// }
-
-export { useEventListener };

@@ -26,39 +26,30 @@ import { isBrowser } from './helper';
 // }
 
 export function useMediaQuery(query: string): boolean {
-    const getMatches = (query: string): boolean => {
-        // Prevents SSR issues
-
-        return isBrowser ? window.matchMedia(query).matches : false;
-    };
-
-    const [matches, setMatches] = useState<boolean>(getMatches(query));
-
-    function handleChange() {
-        setMatches(getMatches(query));
-    }
-
+    const [matches, setMatches] = useState<boolean>(false);
     useEffect(() => {
-        const matchMedia = window.matchMedia(query);
+        const matchMedia: MediaQueryList = window.matchMedia(query);
+
+        const handler = (event: MediaQueryListEvent) => {
+            setMatches(event.matches);
+        };
 
         // Triggered at the first client-side load and if query changes
-        handleChange();
+        setMatches(matchMedia.matches);
 
-        // Listen matchMedia
         if (matchMedia.addListener) {
-            matchMedia.addListener(handleChange);
+            matchMedia.addListener(handler);
         } else {
-            matchMedia.addEventListener('change', handleChange);
+            matchMedia.addEventListener('change', handler);
         }
 
         return () => {
             if (matchMedia.removeListener) {
-                matchMedia.removeListener(handleChange);
+                matchMedia.removeListener(handler);
             } else {
-                matchMedia.removeEventListener('change', handleChange);
+                matchMedia.removeEventListener('change', handler);
             }
         };
-        
     }, [query]);
 
     return matches;
